@@ -5,7 +5,6 @@
 <!-- code_chunk_output -->
 
 - [TypeScript 解説](#typescript-解説)
-  - [想定読者](#想定読者)
 - [概念編](#概念編)
   - [TypeScript とは](#typescript-とは)
     - [言語としての Typescript](#言語としての-typescript)
@@ -13,12 +12,12 @@
     - [メリット](#メリット)
   - [背景](#背景)
     - [歴史](#歴史)
-      - [標準](#標準)
+      - [標準化への流れ](#標準化への流れ)
         - [ECMA TC39](#ecma-tc39)
       - [モジュール仕様](#モジュール仕様)
       - [まとめ](#まとめ)
     - [複雑化](#複雑化)
-    - [コードバンドラ | トランスパイラ](#コードバンドラ-トランスパイラ)
+    - [コードバンドラ | トランスパイラ](#コードバンドラ--トランスパイラ)
       - [Webpack(コードバンドラ)](#webpackコードバンドラ)
       - [Babel(トランスパイラ)](#babelトランスパイラ)
       - [Rome(all-in-one tool)](#romeall-in-one-tool)
@@ -76,7 +75,7 @@
     - [type-guard](#type-guard)
   - [typeof, keyof](#typeof-keyof)
   - [optional type](#optional-type)
-  - [non-null assersion operator (Postfix `!`)](#non-null-assersion-operator-postfix)
+  - [non-null assersion operator (Postfix `!`)](#non-null-assersion-operator-postfix-)
   - [class access modifier](#class-access-modifier)
   - [module, namespace, interface 合成](#module-namespace-interface-合成)
   - [index signature, mapped type](#index-signature-mapped-type)
@@ -109,14 +108,6 @@
 
 <!-- /code_chunk_output -->
 
-## 想定読者
-
-- javascript 完全理解済
-- 静的型付け言語経験済み
-  - Java/C++など
-- モダン目な静的型付け言語をかじってるといいかも
-  - Rust, Go, Kotlin/Swift など
-
 # 概念編
 
 ## TypeScript とは
@@ -138,34 +129,38 @@
 ### モジュールとしての Typescript
 
 - トランスパイラ
+  - typescriptを変換してjavascriptを出力する
   - 構文エラー・型の違反をエラーとして報告する
-  - 各種バージョンの javascript に変換できる
-    - ES3、ES5, ES6, ES2016 ... ES2020, ESNEXT
-- 言語サーバー
-  - [MS がなんか言ってるやつ](https://docs.microsoft.com/ja-jp/visualstudio/extensibility/language-server-protocol?view=vs-2019)
-  - エディターにもろもろの開発支援情報を与えるための機能
+  - 最新仕様構文を各種バージョンの javascript に変換できる
+    - ES3、ES5, ES6, ES2016, ... , ES2020,..., ESNEXT
+- 言語サーバー(Language Server)
+  - エディターと通信して各種の開発支援情報を表示する仕組み:[LSP=Language Server Protocol](https://docs.microsoft.com/ja-jp/visualstudio/extensibility/language-server-protocol?view=vs-2019)
     - Syntax Highlighting
     - 構文エラーの表示
     - 補完情報の表示
-    - ライブラリの定義情報・参照への移動
+    - 定義情報・参照への移動
       など
-  - エディターで開くとクラス名が緑になったり変数が青になったりするのはこの言語サーバーのおかげなんです
+  - エディターでソースコードを開くと解析されてトークンに色がつくのはこの仕組みがあるため。
   - vscode でやる分には自動的に起動するので気にする必要はない
-
-当然構文解析器などの機能もあるが省略。よくわかってないし
+- コンパイラーモジュール
+  - 上記の機能をjavascriptモジュールとして呼び出し、任意のプログラムから利用できる。
 
 ### メリット
 
 - 入力値の型バリデーションの必要性が消滅
-  - ライブラリとして公開する場合は境界面でバリデーションをつけたほうがいいのは変わりないが
+  - 特別な方法を用いない限り、意図されない入力はできない。
+  - ライブラリとして公開する場合はtypescriptとして使用されない可能性を考慮してバリデーションをする必要がある。
 - 補完が利く
 - 型定義がプログラムに含まれることで、doc コメントがメンテされない可能性が減る
+  - コメントは動作に影響しないため、メンテナンスされないことがままある。型情報は食い違うとエラーとなるためメンテされる。
 - コンパイラがエラー吐かないなら大体動作するの状態に
-  - 型システム内である型が
-    - "HOGE"か"FUGA"のみ
-    - 1、2、3 のみ
-      のようなことが可能(※リテラルの値で型を指定できる言語はそう多くない印象)
+  - 以下のような類を見ない厳しく柔軟な型付けができるため
+    - 型システム内である型が
+      - "HOGE"か"FUGA"のみ
+      - 1、2、3 のみ
+        のようなことが可能(※リテラルの値で型を指定できる言語は多くない印象)
 - 複数種の型がありえる数値の、ある型を適切にハンドルしていないようなことが判別可能に
+  - switch構文が網羅されていないときエラーするような機能がある
 
 ## 背景
 
@@ -179,7 +174,7 @@
 
 この辺とか　https://ja.wikipedia.org/wiki/JavaScript#%E6%AD%B4%E5%8F%B2
 
-#### 標準
+#### 標準化への流れ
 
 - javascript は 1995 年、NetScape 社の自社ブラウザのスクリプト言語になるべく開発された。
   - Java が流行ってたから javascript と命名されたが特に共通点はない
@@ -241,10 +236,10 @@
 #### まとめ
 
 - ES4 は存在しない
-- ES3, ES5, ES6(ES2015) とそれ以降で大体わかれる
+- ES3, ES5, ES6(ES2015)以降で大体わかれる
 - javascript の前方変換はよく ES3,ES5 が候補としてあがる。
   - ES6 以降が動く環境では最新まで動くことが多いからだと思われる
-- commonjs module は標準ではない
+- commonjs module (Node.jsのモジュール仕様) は標準ではない
 - ECMA 標準のモジュール仕様は 2015 年に標準化。
   - ブラウザに実装されだしたのが 2017 - 2018 年の間。
 - `npm`でモジュールが管理されることが多い
